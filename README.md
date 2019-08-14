@@ -120,7 +120,7 @@
     - [系统编程](#系统编程)
         - [106.进程总结](#106进程总结)
         - [107.谈谈你对多进程，多线程，以及协程的理解，项目是否用？](#107谈谈你对多进程多线程以及协程的理解项目是否用)
-        - [108.Python异步使用场景有那些？](#108python异步使用场景有那些)
+        - [108.Python异常使用场景有那些？](#108python异常使用场景有那些)
         - [109.多线程共同操作同一个数据互斥锁同步？](#109多线程共同操作同一个数据互斥锁同步)
         - [110.什么是多线程竞争？](#110什么是多线程竞争)
         - [111.请介绍一下Python的线程同步？](#111请介绍一下python的线程同步)
@@ -271,7 +271,10 @@
         - [244.怎么在海量数据中找出重复次数最多的一个？](#244怎么在海量数据中找出重复次数最多的一个)
         - [245.判断数据是否在大量数据中](#245判断数据是否在大量数据中)
 
+
+
 <!-- /TOC -->
+
 # Python基础
 ## 文件操作
 ### 1.有一个jsonline格式的文件file.txt大小约为10K
@@ -439,8 +442,6 @@ b. Python3里只有新式类
 c. Python2里面继承object的是新式类，没有写父类的是经典类
 
 d. 经典类目前在Python里基本没有应用
-
-e.经典类的MRO是深度优先搜索，新式类的MRO是广度优先搜索
 
 ### 16.python中内置的数据结构有几种？
 a. 整型 int、 长整型 long、浮点型 float、 复数 complex
@@ -743,26 +744,33 @@ def atoi(s):
     return reduce(lambda num, v: num * 10 + ord(v) - ord('0'), s, 0)
 ```
 ### 29.Given an array of integers
-给定一个整数数组和一个目标值，找出数组中和为目标值的两个数。你可以假设每个输入只对应一种答案，且同样的元素不能被重复利用。示例:给定`nums = [2, 7, 11, 15]`, `target=9` 因为 `nums[0] + nums[1] = 2 + 7 = 9`,所以返回 `[0, 1]`
+给定一个整数数组和一个目标值，找出数组中和为目标值的两个数。你可以假设每个输入只对应一种答案，且同样的元素不能被重复利用。示例:给定nums = [2,7,11,15],target=9 因为 nums[0]+nums[1] = 2+7 =9,所以返回[0,1]
 ```python
-from typing import List
-
-def two_sum(nums: List[int], target: int) -> List[int]:
-    s = {}
-    for i, n in enumerate(nums):
-        if (target-n) in s:
-            return [s[target-n], i]
-        else:
-            s[n] = i
-
-nums = [2, 7, 11, 15]
+class Solution:
+    def twoSum(self,nums,target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: List[int]
+        """
+        d = {}
+        size = 0
+        while size < len(nums):
+            if target-nums[size] in d:
+                if d[target-nums[size]] <size:
+                    return [d[target-nums[size]],size]
+                else:
+                    d[nums[size]] = size
+                size = size +1
+solution = Solution()
+list = [2,7,11,15]
 target = 9
-result = two_sum(list_, target)
-print(result)  # [0, 1]
+nums = solution.twoSum(list,target)
+print(nums)
 ```
-给列表中的字典排序：假设有如下 list 对象，`alist = [{"name": "a", "age": 20}, {"name": "b", "age": 30}, {"name": "c", "age": 25}]`, 将alist中的元素按照 age 从大到小排序 `alist_sort = [{"name": "b", "age": 30}, {"name": "c", "age": 25}, {"name": "a", "age": 20}]`
+给列表中的字典排序：假设有如下list对象，alist=[{"name":"a","age":20},{"name":"b","age":30},{"name":"c","age":25}],将alist中的元素按照age从大到小排序 alist=[{"name":"a","age":20},{"name":"b","age":30},{"name":"c","age":25}]
 ```python
-alist_sort = sorted(alist, key=lambda e: e.get("age"), reverse=True)
+alist_sort = sorted(alist,key=lambda e: e.__getitem__('age'),reverse=True)
 ```
 
 ### 30.python代码实现删除一个list里面的重复元素
@@ -1035,7 +1043,31 @@ class Array:
 ### 45.介绍Cython，Pypy Cpython Numba各有什么缺点
 Cython
 ### 46.请描述抽象类和接口类的区别和联系
+
+1.抽象类： 规定了一系列的方法，并规定了必须由继承类实现的方法。由于有抽象方法的存在，所以抽象类不能实例化。可以将抽象类理解为毛坯房，门窗，墙面的样式由你自己来定，所以抽象类与作为基类的普通类的区别在于约束性更强
+
+2.接口类：与抽象类很相似，表现在接口中定义的方法，必须由引用类实现，但他与抽象类的根本区别在于用途：与不同个体间沟通的规则，你要进宿舍需要有钥匙，这个钥匙就是你与宿舍的接口，你的舍友也有这个接口，所以他也能进入宿舍，你用手机通话，那么手机就是你与他人交流的接口
+
+3.区别和关联：
+
+1.接口是抽象类的变体，接口中所有的方法都是抽象的，而抽象类中可以有非抽象方法，抽象类是声明方法的存在而不去实现它的类
+
+2.接口可以继承，抽象类不行
+
+3.接口定义方法，没有实现的代码，而抽象类可以实现部分方法
+
+4.接口中基本数据类型为static而抽象类不是
+
 ### 47.Python中如何动态获取和设置对象的属性？
+
+```python
+if hasattr(Parent, 'x'):
+    print(getattr(Parent, 'x'))
+    setattr(Parent, 'x',3)
+print(getattr(Parent,'x'))
+```
+
+
 
 ## 内存管理与垃圾回收机制
 ### 48.哪些操作会导致Python内存溢出，怎么处理？
@@ -1548,18 +1580,7 @@ class MyCls(object):
 
 ## 正则表达式
 ### 94.请写出一段代码用正则匹配出ip？
-```python
-def ip_match(ip_str):
-    partterns = re.compile(r"(2(5[0-5]{1}|[0-4]\d{1})|[0-1]?\d{1,2})(\.(2(5[0-5]{1}|[0-4]\d{1})|[0-1]?\d{1,2})){3}")
-    print(partterns.search(ip_str).group(0))
-```
 ### 95.a = “abbbccc”，用正则匹配为abccc,不管有多少b，就出现一次？
-```python
-def remove_b(test_str):
-    res = re.compile('(?<=a).*?(?=c)')
-    ret = res.sub("b",test_str)
-    print(ret)
-```
 ### 96.Python字符串查找和替换？
 ### 97.用Python匹配HTML g tag的时候，<.> 和 <.*?> 有什么区别
 ### 98.正则表达式贪婪与非贪婪模式的区别？
@@ -1570,56 +1591,6 @@ def remove_b(test_str):
 ### 103.简述Python里面search和match的区别
 ### 104.请写出匹配ip的Python正则表达式
 ### 105.Python里match与search的区别？
-
-match 方法用于查找字符串的头部（也可以指定起始位置），它是一次匹配，只要找到了一个匹配的结果就返回，而不是查找所有匹配的结果。它的一般使用形式如下：
-
-```python
-match(string[, pos[, endpos]])
-其中，string 是待匹配的字符串，pos 和 endpos 是可选参数，指定字符串的起始和终点位置，默认值分别是 0 和 len (字符串长度)。因此，**当你不指定 pos 和 endpos 时，match 方法默认匹配字符串的头部**。
-当匹配成功时，返回一个 Match 对象，如果没有匹配上，则返回 None。
->>> import re
->>> pattern = re.compile(r'\d+')                    # 用于匹配至少一个数字
->>> m = pattern.match('one12twothree34four')        # 查找头部，没有匹配
->>> print m
-None
->>> m = pattern.match('one12twothree34four', 2, 10) # 从'e'的位置开始匹配，没有匹配
->>> print m
-None
->>> m = pattern.match('one12twothree34four', 3, 10) # 从'1'的位置开始匹配，正好匹配
->>> print m                                         # 返回一个 Match 对象
-<_sre.SRE_Match object at 0x10a42aac0>
->>> m.group(0)   # 可省略 0
-'12'
->>> m.start(0)   # 可省略 0
-3
->>> m.end(0)     # 可省略 0
-5
->>> m.span(0)    # 可省略 0
-(3, 5)
-```
-## search 方法
-
-search 方法用于查找字符串的任何位置，它也是一次匹配，只要找到了一个匹配的结果就返回，而不是查找所有匹配的结果，它的一般使用形式如下：
-search(string[, pos[, endpos]])
-其中，string 是待匹配的字符串，pos 和 endpos 是可选参数，指定字符串的起始和终点位置，默认值分别是 0 和 len (字符串长度)。
-
-当匹配成功时，返回一个 Match 对象，如果没有匹配上，则返回 None。
-```python
->>> import re
->>> pattern = re.compile('\d+')
->>> m = pattern.search('one12twothree34four')  # 这里如果使用 match 方法则不匹配
->>> m
-<_sre.SRE_Match object at 0x10cc03ac0>
->>> m.group()
-'12'
->>> m = pattern.search('one12twothree34four', 10, 30)  # 指定字符串区间
->>> m
-<_sre.SRE_Match object at 0x10cc03b28>
->>> m.group()
-'34'
->>> m.span()
-(13, 15)
-```
 
 ## 系统编程
 ### 106.进程总结
@@ -2277,8 +2248,31 @@ Session采用的是在服务器端保持状态的方案，而Cookie采用的是�
 ## 爬虫
 ### 159.试列出至少三种目前流行的大型数据库
 ### 160.列举您使用过的Python网络爬虫所用到的网络数据包?
+
+requests, urllib,urllib2, httplib2
+
 ### 161.爬取数据后使用哪个数据库存储数据的，为什么？
+
 ### 162.你用过的爬虫框架或者模块有哪些？优缺点？
+
+Python自带：urllib,urllib2
+
+第三方：requests
+
+框架： Scrapy
+
+urllib 和urllib2模块都做与请求URL相关的操作，但他们提供不同的功能。
+
+urllib2: urllib2.urlopen可以接受一个Request对象或者url,(在接受Request对象时，并以此可以来设置一个URL的headers),urllib.urlopen只接收一个url。
+
+urllib 有urlencode,urllib2没有，因此总是urllib, urllib2常会一起使用的原因
+
+scrapy是封装起来的框架，他包含了下载器，解析器，日志及异常处理，基于多线程，twisted的方式处理，对于固定单个网站的爬取开发，有优势，但是对于多网站爬取100个网站，并发及分布式处理不够灵活，不便调整与扩展
+
+requests是一个HTTP库，它只是用来请求，它是一个强大的库，下载，解析全部自己处理，灵活性高
+
+Scrapy优点：异步，xpath，强大的统计和log系统，支持不同url。shell方便独立调试。写middleware方便过滤。通过管道存入数据库
+
 ### 163.写爬虫是用多进程好？还是多线程好？
 ### 164.常见的反爬虫和应对方法？
 ### 165.解析网页的解析器使用最多的是哪几个?
@@ -2447,49 +2441,6 @@ redis检查内存使用情况，如果大于maxmemory的限制，则根据设定
 
 ## 数据结构
 ### 222.数组中出现次数超过一半的数字-Python版
-
-#### 方法一
-
-```python
-def majority_element(nums):
-    nums.sort()
-    return nums[len(nums) // 2]
-```
-
-#### 方法二
-
-```python
-from functools import reduce
-
-
-def majority_element(nums):
-    return reduce(lambda n, x: (n[0], n[1] + 1) if n[0] == x else ((x, 1) if n[1] - 1 < 0 else (n[0], n[1] - 1)), nums, (None, -1))[0]
-```
-
-#### 方法三
-
-```python
-from collections import Counter
-
-
-def majority_element(nums):
-    return Counter(nums).most_common(1)[0][0]
-```
-
-#### 方法四
-
-```python
-from random import choice
-
-
-def majority_element(nums):
-    length = len(nums) // 2
-    while True:
-        n = choice(nums)
-        if nums.count(n) > length:
-            return n
-```
-
 ### 223.求100以内的质数
 ### 224.无重复字符的最长子串-Python实现
 ### 225.通过2个5/6升得水壶从池塘得到3升水
@@ -2554,9 +2505,9 @@ def fibs():
         
         
 def fibonacci(n):
-    fibs = fibs()
+    fibs_ = fibs()
     for _ in range(n):
-        next(fibs)
+        next(fibs_)
     return next(fibs)
 ```
 
@@ -2564,7 +2515,7 @@ def fibonacci(n):
 
 **矩阵**
 
-```
+```python
 import numpy as np
 def fibonacci(n):
     return (np.matrix([[0, 1], [1, 1]]) ** n)[1, 1]
@@ -2588,8 +2539,72 @@ def fibonacci(n):
 ```
 
 ### 233.如何翻转一个单链表？
+
+```python
+class Node:
+    def __init__(self,data=None,next=None):
+        self.data = data
+        self.next = next
+        
+def rev(link):
+    pre = link
+    cur = link.next
+    pre.next = None
+    while cur:
+        temp  = cur.next
+        cur.next = pre
+        pre = cur
+        cur = tmp
+    return pre
+
+if __name__ == '__main__':
+    link = Node(1,Node(2,Node(3,Node(4,Node(5,Node(6,Node7,Node(8.Node(9))))))))
+    root = rev(link)
+    while root:
+        print(roo.data)
+        root = root.next
+```
+
+
+
 ### 234.青蛙跳台阶问题
+
+一只青蛙要跳上n层高的台阶，一次能跳一级，也可以跳两级，请问这只青蛙有多少种跳上这个n层台阶的方法？
+
+方法1：递归
+
+设青蛙跳上n级台阶有f(n)种方法，把这n种方法分为两大类，第一种最后一次跳了一级台阶，这类共有f(n-1)种，第二种最后一次跳了两级台阶，这种方法共有f(n-2)种，则得出递推公式f(n)=f(n-1) + f(n-2),显然f(1)=1,f(2)=2，这种方法虽然代码简单，但效率低，会超出时间上限
+
+```python
+class Solution:
+    def climbStairs(self,n):
+        if n ==1:
+            return 1
+        elif n==2:
+            return 2
+        else:
+            return self.climbStairs(n-1) + self.climbStairs(n-2)
+```
+
+方法2：用循环来代替递归
+
+```python
+class Solution:
+    def climbStairs(self,n):
+        if n==1 or n==2:
+            return n
+        a,b,c = 1,2,3
+        for i in range(3,n+1):
+            c = a+b
+            a = b
+            b = c
+        return c
+```
+
 ### 235.两数之和 Two Sum
+
+
+
 ### 236.搜索旋转排序数组 Search in Rotated Sorted Array
 ### 237.Python实现一个Stack的数据结构
 ### 238.写一个二分查找
@@ -2601,3 +2616,9 @@ def fibonacci(n):
 ### 243.一个大约有一万行的文本文件统计高频词
 ### 244.怎么在海量数据中找出重复次数最多的一个？
 ### 245.判断数据是否在大量数据中
+
+## 架构
+
+### [Python后端架构演进](<https://zhu327.github.io/2018/07/19/python%E5%90%8E%E7%AB%AF%E6%9E%B6%E6%9E%84%E6%BC%94%E8%BF%9B/>)
+
+这篇文章几乎涵盖了python会用的架构，在面试可以手画架构图，根据自己的项目谈下技术选型和优劣，遇到的坑等。绝对加分
